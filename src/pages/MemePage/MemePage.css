@@ -1,0 +1,12 @@
+.index-page__meme {
+  width: 46%;
+  height: 60vw;
+  display: inline-block;
+  padding-left: 2%;
+}
+
+.index-page__meme_image{
+ width: 80%;
+ padding-left: 10%;
+ object-fit: cover;
+}
