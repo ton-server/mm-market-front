@@ -1,7 +1,8 @@
 import type { ComponentType, JSX } from 'react';
 
 import { IndexPage } from '@/pages/IndexPage/IndexPage';
-import { MemeBuy } from '@/pages/MemePage/MemePage';
+import { MemePage } from '@/pages/MemePage/MemePage';
+import { AssetPage } from '@/pages/AssetPage/AssetPage';
 
 interface Route {
   path: string;
@@ -12,5 +13,6 @@ interface Route {
 
 export const routes: Route[] = [
   { path: '/', Component: IndexPage },
-  { path: '/meme_buy', Component: MemeBuy, title: 'Meme Buy' },
+  { path: '/meme', Component: MemePage, title: 'Meme Page' },
+  { path: '/asset', Component: AssetPage, title: 'Asset Page' },
 ];

@@ -1,4 +1,6 @@
-import axios from 'axios';
+import Axios from 'axios';
+
+export const axios = Axios.create();
 
 // 设置接口超时时间
 axios.defaults.timeout = 60000;
@@ -40,3 +42,5 @@ export function request<T>(url = '', params = {}, method = 'GET'): Promise<T> {
             .catch(error => reject(error))
     })
 }
+
+export default axios;

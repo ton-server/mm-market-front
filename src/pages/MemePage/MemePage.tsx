@@ -1,102 +1,49 @@
 
-import { useEffect, useState, type FC } from 'react';
+import { useState, type FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
-import { Navigate } from 'react-router-dom'
-import { Title, Input, Button, Modal, Text, Link, Section } from '@telegram-apps/telegram-ui';
-import { Address, TonClient, toNano, fromNano } from "@ton/ton";
-import { DEX, pTON } from "@ston-fi/sdk";
-import { StonApiClient } from '@ston-fi/api';
+import { Title, Button, Modal, Text, Link } from '@telegram-apps/telegram-ui';
+import { toNano } from "@ton/ton";
 
-
-import { getVIPReceiver, getIdentity, upgradeVIP } from "@/api";
+import { useWallet, tonToken, vipReceiver, vipAmount, shortAddress, amount2Str } from '@/hooks/useSwap';
 import { Page } from '@/components/Page.tsx';
 
-const client = new TonClient({
-  endpoint: "https://toncenter.com/api/v2/jsonRPC",
-  apiKey: "83bfe6338b6cbebdb4f8f14b4bccfc2b91cd6eff80db3e141db8b7dcf8e4e830",
-});
-
-const dex = client.open(new DEX.v1.Router());
-
-const stonApi = new StonApiClient();
+import './MemePage.css';
 
 // 购买或出售Meme界面
-export const MemeBuy: FC = () => {
+export const MemePage: FC = () => {
   const [searchParams] = useSearchParams();
   const meme = JSON.parse(searchParams.get("data") || "{}");
+  const tokenA = searchParams.get("token_in") || tonToken;
+  const tokenB = tokenA === tonToken ? meme.address : tonToken;
 
-  if (!meme.address) {
-    return <Navigate to='/' />;
-  }
-
-  const [tonConnect] = useTonConnectUI();
-  const wallet = useTonAddress();
-  const [vipReceiver, setVIPReceiver] = useState("");
+  const { connect, account, swapRate, swap, upgrade } = useWallet(tokenA, tokenB);
   const [showModal, setShowModal] = useState(false);
-  const [allowSwap, setAllowSwap] = useState(false);
-  const [inTon, setInTon] = useState("");
-  const [swapRate, setSwapRate] = useState(0);
-  const [balance, setBalance] = useState(0);
+  const [amount, setAmount] = useState("");
 
-  useEffect(() => {
-    if (wallet) {
-      client.getBalance(Address.parse(wallet))
-        .then(value => setBalance(Number(fromNano(value))));
-    }
 
-    stonApi.simulateSwap({
-      offerAddress: 'UQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJKZ',
-      askAddress: meme.address,
-      offerUnits: toNano(1).toString(),
-      slippageTolerance: "0.01",
-      dexV2: true,
-    }).then(({ swapRate }) => {
-      setSwapRate(Number(swapRate));
-    })
-  }, [wallet])
-
-  const handleBuy = async () => {
-    if (!tonConnect.account?.address) {
-      alert("先连接钱包才能购买！");
-      tonConnect.openModal();
+  const handleSwap = async () => {
+    if (!account) {
+      alert("先连接钱包才能交易！");
+      connect();
       return;
     }
 
-    const identity = await getIdentity(wallet);
-
-    if (identity.upgrading) {
-      alert("账户正在升级中，请稍后再试！");
-      return;
-    }
-
-    if (!identity.is_vip) {
-      alert("成为VIP用户才能购买！");
-      const receiver = await getVIPReceiver();
-      setVIPReceiver(receiver);
+    if (account.expireTime < Date.now()) {
       setShowModal(true);
       return;
     }
 
+    const value = parseFloat(amount);
+    if (isNaN(value) || value > Number(holdAmount)) {
+      alert("输入金额有误！");
+      return;
+    }
+
     try {
-      const txParams = await dex.getSwapTonToJettonTxParams({
-        offerAmount: toNano(inTon), // swap 1 TON
-        askJettonAddress: meme.address, // for a STON
-        minAskAmount: toNano("0"), // but not less than 0 STON
-        proxyTon: new pTON.v1(),
-        userWalletAddress: wallet,
-      });
-      const { boc } = await tonConnect.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 600,
-        messages: [
-          {
-            address: txParams.to.toString(),
-            amount: txParams.value.toString(),
-            payload: txParams.body?.toBoc().toString("base64"),
-          },
-        ]
-      });
-      console.log(boc);
+      const offerAmount = tokenA === tonToken ?
+        toNano(value) :
+        BigInt(value * 10 ** Number(meme.decimals));
+      await swap(tokenA, tokenB, offerAmount);
       alert("兑换成功！");
     } catch (error) {
       alert("兑换失败，请稍后重试！错误:" + error);
@@ -105,56 +52,61 @@ export const MemeBuy: FC = () => {
 
   const handleVIP = async () => {
     try {
-      const { boc } = await tonConnect.sendTransaction({
-        validUntil: Math.floor(Date.now() / 1000) + 600,
-        messages: [{
-          address: vipReceiver,
-          amount: "100000000"
-        }]
-      });
-      await upgradeVIP(wallet, boc)
+      await upgrade();
       alert("账户升级成功！");
-      setShowModal(false);
     } catch (error) {
       alert("账户升级失败，请稍后重试！错误:" + error);
     }
+    setShowModal(false);
   };
 
-  const handleSetInTon = ({ target: { value } }: { target: { value: string } }) => {
+  const handleInput = ({ target: { value } }: { target: { value: string } }) => {
+    if (!account) {
+      return;
+    }
     if (value === "") {
-      setInTon(value);
+      setAmount(value);
       return;
     }
     const amount = parseFloat(value);
     if (!isNaN(amount) && isFinite(amount) && amount >= 0) {
-      setInTon(value);
-      setAllowSwap(amount <= balance);
+      setAmount(value);
     }
   }
 
-  const shortAddress = (address: string, n: number) => {
-    return address.slice(0, n) + '..' + address.slice(48 - n, 48);
-  };
+
 
   const copyVIPReceiver = () => {
     navigator.clipboard.writeText(vipReceiver);
   };
 
+  const offerSymbol = tokenA === tonToken ? 'Ton' : meme.symbol;
+  const askSymbol = tokenA !== tonToken ? 'Ton' : meme.symbol;
+  const holdAmount = tokenA === tonToken ?
+    amount2Str(account?.balance || 0n, 9) :
+    amount2Str(meme.balance, meme.decimals);
+
   return (
     <Page>
-      <Title>{meme.name}</Title>
-      <img src={meme.image} />
-      <span>{`你将获得 ${inTon === "" ? 0 : swapRate * Number(inTon)} 个 ${meme.symbol}`}</span>
-      <Input placeholder='请输入支付Ton数量' value={inTon} onChange={handleSetInTon} />
-      <Text> 1 Ton ≈ {swapRate} {meme.symbol} </Text>
-      <Text style={{ float: "right" }}> {balance.toFixed(3)} Ton 可用 </Text>
-      <Button disabled={!allowSwap} onClick={handleBuy} style={{ display: "block" }}>提交交易</Button>
-      <Section>{`>> 充值`}</Section>
-      <Link href='https://t.me/wallet/start' target='_blank'>{shortAddress(wallet, 18)}</Link>
-      <Modal open={showModal} onOpenChange={status => setShowModal(status)} style={{ height: "60vw" }}>
-        <Text> 当前账户为普通用户，不能进行交易，如果需要继续交易，需要升级到VIP用户 </Text>
-        <Text> 向<a onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</a>充值10ton,即成为VIP用户，享受无限次数的交易 </Text>
-        <Button onClick={handleVIP}>账户升级</Button>
+      <div className='meme-page_content'>
+        <Title>{meme.name}</Title>
+        <img src={meme.image} className='meme-page_image' />
+        <span>{`你将获得 ${Number((Number(swapRate) * Number(amount)).toFixed(3))} 个 ${askSymbol}`}</span>
+        <input placeholder={`请输入支付${offerSymbol}数量`} value={amount} onChange={handleInput} className='meme-page_input' />
+        <Text> 1 {offerSymbol} ≈ {Number(swapRate).toFixed(3)} {askSymbol} </Text>
+        <Text style={{ float: "right" }}> {holdAmount} {offerSymbol} 可用 </Text>
+        <Button onClick={handleSwap} className='meme-page_button'>提交交易</Button>
+        <Text style={{ display: "block" }}>{`>> 充值`}</Text>
+        {account &&
+          <Link href='https://t.me/wallet/start' target='_blank'>地址：{shortAddress(account.address, 13)}</Link>}
+      </div>
+      <Modal style={{ backgroundColor: "goldenrod" }} open={showModal} onOpenChange={status => setShowModal(status)}>
+        <div className='meme-page_upgrade'>
+          <Text> 当前账户为普通用户，不能进行交易，如果需要继续交易，需要升级到VIP用户 </Text>
+          <div style={{ width: "100%", height: "1px", backgroundColor: "black", margin: "16px auto" }} />
+          <Text> 向<Link onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</Link>充值 {vipAmount} ton,即成为VIP用户，享受无限次数的交易 </Text>
+          <Button onClick={handleVIP} style={{ width: "100%", margin: "30px auto 20px" }}>账户升级</Button>
+        </div>
       </Modal>
     </Page>
   );

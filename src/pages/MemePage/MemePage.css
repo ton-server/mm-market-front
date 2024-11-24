@@ -1,12 +1,32 @@
-.index-page__meme {
-  width: 46%;
-  height: 60vw;
-  display: inline-block;
-  padding-left: 2%;
+.meme-page_content {
+  width: 90vw;
+  margin: 10px 5vw;
 }
 
-.index-page__meme_image{
- width: 80%;
- padding-left: 10%;
- object-fit: cover;
+.meme-page_image {
+  background-color: rgb(230, 230, 230);
+  width: 100%;
+  object-fit: cover;
+  margin: 4px auto;
+}
+
+.meme-page_input {
+  display: block;
+  width: 96%;
+  height: 34px;
+  border-width: 0;
+  margin: 4px auto;
+  font-size: 18px;
+  padding: 0;
+  padding-left: 8px;
+}
+
+.meme-page_button {
+  width: 100%;
+  margin: 12px auto;
+}
+
+.meme-page_upgrade {
+  width: 92vw;
+  margin: 14px 4vw;
 }
