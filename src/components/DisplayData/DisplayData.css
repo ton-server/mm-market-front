@@ -1,0 +1,11 @@
+.display-data__header {
+    font-weight: 400;
+}
+
+.display-data__line-title {
+    color: var(--tg-theme-subtitle-text-color);
+}
+
+.display-data__line-value {
+    word-break: break-word;
+}

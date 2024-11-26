@@ -2,10 +2,10 @@
 import { useState, type FC } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Title, Button, Modal, Text, Link } from '@telegram-apps/telegram-ui';
-import { toNano } from "@ton/ton";
 
-import { useWallet, tonToken, vipReceiver, vipAmount, shortAddress, amount2Str } from '@/hooks/useSwap';
-import { Page } from '@/components/Page.tsx';
+import { useWallet, tonToken, vipReceiver, vipAmount } from '@/hooks/useSwap';
+import { shortAddress, amount2Str } from "@/helpers/utils";
+import { Page } from '@/components/Page';
 
 import './MemePage.css';
 
@@ -16,7 +16,7 @@ export const MemePage: FC = () => {
   const tokenA = searchParams.get("token_in") || tonToken;
   const tokenB = tokenA === tonToken ? meme.address : tonToken;
 
-  const { connect, account, swapRate, swap, upgrade } = useWallet(tokenA, tokenB);
+  const { connect, account, swapRate, swap, upgrade } = useWallet({ tokenA, tokenB });
   const [showModal, setShowModal] = useState(false);
   const [amount, setAmount] = useState("");
 
@@ -40,10 +40,8 @@ export const MemePage: FC = () => {
     }
 
     try {
-      const offerAmount = tokenA === tonToken ?
-        toNano(value) :
-        BigInt(value * 10 ** Number(meme.decimals));
-      await swap(tokenA, tokenB, offerAmount);
+      const decimals = tokenA === tonToken ? 9 : meme.decimals;
+      await swap(tokenA, tokenB, value, decimals);
       alert("兑换成功！");
     } catch (error) {
       alert("兑换失败，请稍后重试！错误:" + error);
@@ -61,9 +59,6 @@ export const MemePage: FC = () => {
   };
 
   const handleInput = ({ target: { value } }: { target: { value: string } }) => {
-    if (!account) {
-      return;
-    }
     if (value === "") {
       setAmount(value);
       return;
@@ -73,8 +68,6 @@ export const MemePage: FC = () => {
       setAmount(value);
     }
   }
-
-
 
   const copyVIPReceiver = () => {
     navigator.clipboard.writeText(vipReceiver);
@@ -91,7 +84,20 @@ export const MemePage: FC = () => {
       <div className='meme-page_content'>
         <Title>{meme.name}</Title>
         <img src={meme.image} className='meme-page_image' />
-        <span>{`你将获得 ${Number((Number(swapRate) * Number(amount)).toFixed(3))} 个 ${askSymbol}`}</span>
+        <Text>
+          {`你将获得 ${Number((Number(swapRate) * Number(amount)).toFixed(3))} 个 ${askSymbol}`}
+        </Text>
+        <span style={{ fontSize: "14px" }}>
+          {' ('}
+          {meme.usdPrice > 0.001 ? '$' + Number(meme.usdPrice.toFixed(3)) : '<$0.001'}
+          {
+            meme.dayChange === '--' ?
+              ' --%' :
+              <span style={{ color: parseFloat(meme.dayChange) < 0 ? 'red' : 'green' }}>{' ' + meme.dayChange}</span>
+
+          }
+          {')'}
+        </span>
         <input placeholder={`请输入支付${offerSymbol}数量`} value={amount} onChange={handleInput} className='meme-page_input' />
         <Text> 1 {offerSymbol} ≈ {Number(swapRate).toFixed(3)} {askSymbol} </Text>
         <Text style={{ float: "right" }}> {holdAmount} {offerSymbol} 可用 </Text>
@@ -104,7 +110,7 @@ export const MemePage: FC = () => {
         <div className='meme-page_upgrade'>
           <Text> 当前账户为普通用户，不能进行交易，如果需要继续交易，需要升级到VIP用户 </Text>
           <div style={{ width: "100%", height: "1px", backgroundColor: "black", margin: "16px auto" }} />
-          <Text> 向<Link onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</Link>充值 {vipAmount} ton,即成为VIP用户，享受无限次数的交易 </Text>
+          <Text> 向 <Link onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</Link> 充值 {vipAmount} ton,即成为VIP用户，享受无限次数的交易 </Text>
           <Button onClick={handleVIP} style={{ width: "100%", margin: "30px auto 20px" }}>账户升级</Button>
         </div>
       </Modal>

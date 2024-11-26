@@ -1,0 +1,15 @@
+.detail-page_content {
+    margin-top: 10px;
+}
+
+.detail-page_card {
+    width: 96%;
+    margin: 0 2%;
+}
+
+.detail-page_card-type {
+    z-index: 1000;
+    position: absolute;
+    top: 8px;
+    right: 16px;
+}

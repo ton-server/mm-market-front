@@ -1,28 +1,20 @@
-import { useEffect, useState, type FC } from 'react';
 import { Text, Headline, Card } from '@telegram-apps/telegram-ui';
 
-import { useWallet, amount2Str } from '@/hooks/useSwap';
-import { Page } from '@/components/Page.tsx';
-import { Link } from '@/components/Link/Link.tsx';
+import { useWallet, } from '@/hooks/useSwap';
+import { amount2Str } from "@/helpers/utils";
+import { Page } from '@/components/Page';
+import { Link } from '@/components/Link/Link';
 
 import './AssetPage.css';
 
-export const AssetPage: FC = () => {
-  const { account, getAssets } = useWallet();
-
-  const [assetList, setAssetList] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (account) {
-      getAssets().then(data => setAssetList(data));
-    }
-  }, [account])
+export const AssetPage = () => {
+  const { assets } = useWallet({ loadAssets: true });
 
   return (
-    <Page back={false}>
+    <Page>
       <Headline className='asset-page_title'>持有列表</Headline>
       <div className='asset-page__asset-list'>
-        {assetList.map(asset =>
+        {assets.map(asset =>
           <Card key={asset.address} className='asset-page__card'>
             <img src={asset.image} />
             <Text> 数量：{amount2Str(asset.balance, asset.decimals)} </Text>
