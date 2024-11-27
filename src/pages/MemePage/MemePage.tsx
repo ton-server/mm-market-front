@@ -87,17 +87,6 @@ export const MemePage: FC = () => {
         <Text>
           {`你将获得 ${Number((Number(swapRate) * Number(amount)).toFixed(3))} 个 ${askSymbol}`}
         </Text>
-        <span style={{ fontSize: "14px" }}>
-          {' ('}
-          {meme.usdPrice > 0.001 ? '$' + Number(meme.usdPrice.toFixed(3)) : '<$0.001'}
-          {
-            meme.dayChange === '--' ?
-              ' --%' :
-              <span style={{ color: parseFloat(meme.dayChange) < 0 ? 'red' : 'green' }}>{' ' + meme.dayChange}</span>
-
-          }
-          {')'}
-        </span>
         <input placeholder={`请输入支付${offerSymbol}数量`} value={amount} onChange={handleInput} className='meme-page_input' />
         <Text> 1 {offerSymbol} ≈ {Number(swapRate).toFixed(3)} {askSymbol} </Text>
         <Text style={{ float: "right" }}> {holdAmount} {offerSymbol} 可用 </Text>

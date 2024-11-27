@@ -8,7 +8,7 @@ import api from "@/api";
 
 const client = new TonClient({
     endpoint: 'https://toncenter.com/api/v2/jsonRPC',
-    apiKey: '83bfe6338b6cbebdb4f8f14b4bccfc2b91cd6eff80db3e141db8b7dcf8e4e830',
+    apiKey: import.meta.env.VITE_TON_API_KEY,
 });
 const dex = client.open(new DEX.v1.Router());
 const stonApi = new StonApiClient();
@@ -16,8 +16,8 @@ const stonApi = new StonApiClient();
 // ton链的原生货币地址
 export const tonToken = 'EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c';
 // Vip充值接收账户和金额
-export const vipReceiver = 'UQClW8Jh_VKtWs9QO73enyYzLAHhQ-YTZjny2Kk20XAMf1Vt';
-export const vipAmount = '0.1';
+export const vipReceiver = import.meta.env.VITE_VIP_RECEIVER;
+export const vipAmount = import.meta.env.VITE_VIP_AMOUNT;
 
 
 export interface WalletProps { tokenA?: string, tokenB?: string, loadList?: boolean, loadAssets?: boolean, loadHistory?: boolean }

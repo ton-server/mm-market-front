@@ -1,13 +1,12 @@
 .index-page_content {
-  width: 92%;
-  margin: 10px 4%;
+  margin-top: 16px;
 }
 
 .index-page__dropdown {
   position: absolute;
   display: inline-block;
   top: 10px;
-  right: 5%;
+  right: 16px;
 }
 
 .index-page__dropdown-content {
@@ -35,7 +34,7 @@
 }
 
 .index-page_title {
-  padding-left: 1%;
+  padding-left: 20px;
 }
 
 .index-page__meme-list {
@@ -43,23 +42,42 @@
 }
 
 .index-page__card {
-  width: 48%;
-  margin: 1% 1%;
+  position: relative;
+  margin: 0 16px;
+  height: 96px;
 }
 
 .index-page__card>img {
-  width: 90%;
-  margin: 5% 5% 1%;
+  width: 80px;
+  margin: 8px 0;
   object-fit: cover;
 }
 
-.index-page__card>span {
-  display: inline-block;
-  margin-left: 5%;
-  margin-bottom: 2%;
+.index-page__card-name {
+  position: absolute;
+  max-width: 46%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  top: 12px;
+  left: 100px;
 }
 
-.index-page__card>a {
+.index-page__card-price {
   position: absolute;
-  right: 5%;
+  bottom: 12px;
+  left: 100px;
+}
+
+.index-page__card-change {
+  position: absolute;
+  font-size: 20px;
+  top: 12px;
+  right: 0;
+}
+
+.index-page__card>button {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
 }

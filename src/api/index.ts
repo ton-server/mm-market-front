@@ -1,7 +1,7 @@
 
 import { axios, request } from "./axios";
 
-axios.defaults.baseURL = 'https://meme-market.qday.ninja/market'
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 export const getMemeList = async () => {
     const { data: { list } } = await request<{

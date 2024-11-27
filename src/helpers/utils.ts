@@ -16,3 +16,16 @@ export const amount2Str = (amount: bigint | string, decimals: number) => {
 
     return Number(str).toString();
 }
+
+export const price2Str = (price: number, decimals?: number) => {
+    switch (decimals) {
+        case 1:
+            return price > 0.1 ? '$' + Number(price.toFixed(1)) : '<$0.1';
+        case 2:
+            return price > 0.01 ? '$' + Number(price.toFixed(2)) : '<$0.01';
+        case 3:
+            return price > 0.001 ? '$' + Number(price.toFixed(3)) : '<$0.001';
+        default:
+            return price > 0.0001 ? '$' + Number(price.toFixed(4)) : '<$0.0001';
+    }
+}

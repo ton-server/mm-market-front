@@ -1,8 +1,8 @@
-import { Card, Text, Button, Headline, Link } from '@telegram-apps/telegram-ui';
+import { Text, Button, Headline } from '@telegram-apps/telegram-ui';
 import { useNavigate } from 'react-router-dom';
 
 import { useWallet, } from '@/hooks/useSwap';
-import { shortAddress } from "@/helpers/utils";
+import { shortAddress, price2Str } from "@/helpers/utils";
 import { Page } from '@/components/Page';
 
 import './IndexPage.css';
@@ -30,11 +30,13 @@ export const IndexPage = () => {
         <Headline className='index-page_title'>推荐列表</Headline>
         <div className='index-page__meme-list'>
           {recomList.map(meme =>
-            <Card onClick={() => navigate(`/detail?data=${JSON.stringify(meme)}`)} key={meme.address} className='index-page__card'>
+            <div onClick={() => navigate(`/detail?data=${JSON.stringify(meme)}`)} key={meme.address} className='index-page__card'>
               <img src={meme.image} />
-              <Text> {meme.symbol} </Text>
-              <Link onClick={(e) => { e.stopPropagation(); navigate(`/meme?data=${JSON.stringify(meme)}`) }}>购买</Link>
-            </Card>)}
+              <Text className='index-page__card-name'>{meme.name}</Text>
+              <Text className='index-page__card-price'>{price2Str(meme.usdPrice)}</Text>
+              {meme.dayChange === '--' && <label className='index-page__card-change'>--</label>}
+              {meme.dayChange !== '--' && <label className='index-page__card-change' style={{ color: parseFloat(meme.dayChange) < 0 ? 'red' : 'green' }}>{meme.dayChange}</label>}
+            </div>)}
         </div>
       </div>
     </Page>

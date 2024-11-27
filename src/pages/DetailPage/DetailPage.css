@@ -1,4 +1,10 @@
-.detail-page_button {
+.detail-page_button-div {
+  position: fixed;
   width: 90%;
-  margin: 14px 5%;
+  margin: 0 5%;
+  bottom: 20px;
+}
+
+.detail-page_button-div>button {
+  width: 100%;
 }
