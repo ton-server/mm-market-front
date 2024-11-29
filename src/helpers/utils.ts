@@ -2,10 +2,9 @@ export const shortAddress = (address: string, n: number) => {
     return address.slice(0, n) + '..' + address.slice(48 - n, 48);
 };
 
-export const amount2Str = (amount: bigint | string, decimals: number) => {
+export const amount2Str = (amount: bigint | string, decimals: number, saveDecimals: number = 3) => {
     let str = amount.toString();
 
-    const saveDecimals = 3;
     if (str.length <= decimals - saveDecimals) {
         return '0';
     }

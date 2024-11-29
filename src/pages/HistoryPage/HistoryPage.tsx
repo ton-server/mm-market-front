@@ -15,10 +15,10 @@ export const HistoryPage = () => {
         <List>
           {swapRecords.map(record =>
             <Card className='detail-page_card' key={record.time}>
-              <div className='detail-page_card-type'>{record.fromToken !== '' ? '卖出' : '买入'}</div>
-              <Card.Cell>时间： {new Date(record.time).toLocaleString()}</Card.Cell>
-              <Card.Cell>支付： {record.costAmount}</Card.Cell>
-              <Card.Cell>代币： {record.fromToken || record.toToken}</Card.Cell>
+              <div className='detail-page_card-type'>{record.fromToken !== '' ? 'sell' : 'buy'}</div>
+              <Card.Cell>Time:    {new Date(record.time).toLocaleString()}</Card.Cell>
+              <Card.Cell>Payment: {record.costAmount}</Card.Cell>
+              <Card.Cell>Token:   {record.fromToken || record.toToken}</Card.Cell>
             </Card>
           )}
         </List>

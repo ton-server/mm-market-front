@@ -19,15 +19,15 @@ export const IndexPage = () => {
             <>
               <Button size='s' className="index-page__dropdown-btn">{shortAddress(account.address, 4) + ' ▼'}</Button>
               <div className="index-page__dropdown-content">
-                <a onClick={() => navigate('/asset')}>资产</a>
-                <a onClick={() => navigate('/history')}>历史</a>
-                <a onClick={disconnect}>退出</a>
+                <a onClick={() => navigate('/asset')}>Assets</a>
+                <a onClick={() => navigate('/history')}>History</a>
+                <a onClick={disconnect}>Logout</a>
               </div>
             </> :
-            <Button size='s' className="index-page__dropdown-btn" onClick={connect}>连接钱包</Button>
+            <Button size='s' className="index-page__dropdown-btn" onClick={connect}>Connect Wallet</Button>
           }
         </div>
-        <Headline className='index-page_title'>推荐列表</Headline>
+        <Headline className='index-page_title'>Recommended List</Headline>
         <div className='index-page__meme-list'>
           {recomList.map(meme =>
             <div onClick={() => navigate(`/detail?data=${JSON.stringify(meme)}`)} key={meme.address} className='index-page__card'>

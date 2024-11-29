@@ -20,17 +20,17 @@ export const DetailPage = () => {
         <List>
           <DisplayData
             rows={[
-              { title: '名称', value: meme.name },
-              { title: '符号', value: meme.symbol },
-              { title: '精度', value: meme.decimals },
-              { title: '地址', value: meme.address },
-              { title: '发行量', value: meme.totalSupply },
-              { title: '所有者', value: meme.owner },
-              { title: '价格', value: price2Str(meme.usdPrice) },
-              { title: '24H涨幅', value: meme.dayChange },
-              { title: '推荐指数', value: meme.recomIndex },
-              { title: '推荐原因', value: meme.recomReason },
-              { title: '描述', value: meme.description },
+              { title: 'Name', value: meme.name },
+              { title: 'Symbol', value: meme.symbol },
+              { title: 'Decimals', value: meme.decimals },
+              { title: 'Address', value: meme.address },
+              { title: 'Total Supply', value: meme.totalSupply },
+              { title: 'Owner', value: meme.owner },
+              { title: 'USD Price', value: price2Str(meme.usdPrice) },
+              { title: '24H Change', value: meme.dayChange },
+              { title: 'Recommended Index', value: meme.recomIndex },
+              { title: 'Recommended Reason', value: meme.recomReason },
+              { title: 'Description', value: meme.description },
             ]}
           />
         </List>
@@ -40,7 +40,7 @@ export const DetailPage = () => {
             size='l'
             onClick={() => navigate(`/meme?data=${JSON.stringify(meme)}`)}
           >
-            购买
+            Buy
           </Button>
         </div>
       </div>

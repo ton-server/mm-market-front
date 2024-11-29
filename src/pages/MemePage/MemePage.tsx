@@ -23,7 +23,7 @@ export const MemePage: FC = () => {
 
   const handleSwap = async () => {
     if (!account) {
-      alert("先连接钱包才能交易！");
+      alert("Connect your wallet before trading！");
       connect();
       return;
     }
@@ -35,25 +35,25 @@ export const MemePage: FC = () => {
 
     const value = parseFloat(amount);
     if (isNaN(value) || value > Number(holdAmount)) {
-      alert("输入金额有误！");
+      alert("The amount entered is incorrect！");
       return;
     }
 
     try {
       const decimals = tokenA === tonToken ? 9 : meme.decimals;
       await swap(tokenA, tokenB, value, decimals);
-      alert("兑换成功！");
+      alert("Swap successful！");
     } catch (error) {
-      alert("兑换失败，请稍后重试！错误:" + error);
+      alert("Swap Failed, Please try again later! error:" + error);
     }
   };
 
   const handleVIP = async () => {
     try {
       await upgrade();
-      alert("账户升级成功！");
+      alert("Upgrade successful！");
     } catch (error) {
-      alert("账户升级失败，请稍后重试！错误:" + error);
+      alert("Upgrade Failed, Please try again later! error:" + error);
     }
     setShowModal(false);
   };
@@ -85,22 +85,22 @@ export const MemePage: FC = () => {
         <Title>{meme.name}</Title>
         <img src={meme.image} className='meme-page_image' />
         <Text>
-          {`你将获得 ${Number((Number(swapRate) * Number(amount)).toFixed(3))} 个 ${askSymbol}`}
+          {`You will get ${Number((Number(swapRate) * Number(amount)).toFixed(3))} ${askSymbol}`}
         </Text>
-        <input placeholder={`请输入支付${offerSymbol}数量`} value={amount} onChange={handleInput} className='meme-page_input' />
+        <input placeholder={`Please enter the amount of ${offerSymbol} to be paid`} value={amount} onChange={handleInput} className='meme-page_input' />
         <Text> 1 {offerSymbol} ≈ {Number(swapRate).toFixed(3)} {askSymbol} </Text>
-        <Text style={{ float: "right" }}> {holdAmount} {offerSymbol} 可用 </Text>
-        <Button onClick={handleSwap} className='meme-page_button'>提交交易</Button>
-        <Text style={{ display: "block" }}>{`>> 充值`}</Text>
+        <Text style={{ float: "right" }}> {holdAmount} {offerSymbol} Available </Text>
+        <Button onClick={handleSwap} className='meme-page_button'>Submit Transaction</Button>
+        <Text style={{ display: "block" }}>{`>> Top Up`}</Text>
         {account &&
-          <Link href='https://t.me/wallet/start' target='_blank'>地址：{shortAddress(account.address, 13)}</Link>}
+          <Link href='https://t.me/wallet/start' target='_blank'>Address：{shortAddress(account.address, 13)}</Link>}
       </div>
       <Modal style={{ backgroundColor: "goldenrod" }} open={showModal} onOpenChange={status => setShowModal(status)}>
         <div className='meme-page_upgrade'>
-          <Text> 当前账户为普通用户，不能进行交易，如果需要继续交易，需要升级到VIP用户 </Text>
+          <Text> The current account is a common user and cannot trade. If you need to continue trading, you need to upgrade to a VIP user. </Text>
           <div style={{ width: "100%", height: "1px", backgroundColor: "black", margin: "16px auto" }} />
-          <Text> 向 <Link onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</Link> 充值 {vipAmount} ton,即成为VIP用户，享受无限次数的交易 </Text>
-          <Button onClick={handleVIP} style={{ width: "100%", margin: "30px auto 20px" }}>账户升级</Button>
+          <Text> Recharge {vipAmount} ton to <Link onClick={copyVIPReceiver}>{shortAddress(vipReceiver, 5)}</Link> to become a VIP user and enjoy unlimited transactions </Text>
+          <Button onClick={handleVIP} style={{ width: "100%", margin: "30px auto 20px" }}>Account Upgrade</Button>
         </div>
       </Modal>
     </Page>
